@@ -47,7 +47,7 @@ import spacesettlers.utilities.Vector2D;
  * 
  * @author amy modified by Anthony and Spencer
  */
-public class AnthonyModelTeamClient extends TeamClient {
+public class OldClient extends TeamClient {
 	Beacon beacon;
 	Boolean finishedAStar = false;
 	HashMap<UUID, Ship> asteroidToShipMap;

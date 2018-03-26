@@ -31,7 +31,7 @@ public class AStar {
 		}
 		//gets the children of all the children and puts them in the corresponding index
 		for(int i = 0; i < adjacentGridsToShip.size(); i++) {
-			ArrayList<GridSquare> adjacentToGridI = GridSquare.getAdjacent(AnthonyModelTeamClient.grid,adjacentGridsToShip.get(i));
+			ArrayList<GridSquare> adjacentToGridI = GridSquare.getAdjacent(OldClient.grid,adjacentGridsToShip.get(i));
 			if(adjacentToGridI.isEmpty()) {
 				System.err.println("Error: adjacentToGridI is empty, it should not be.");
 				return null;
@@ -107,10 +107,10 @@ public class AStar {
 		else {
 			//if the no "errors" set the childrens children adjacent grids to the adjacent children of the lowest pathcost grid
 			if(lowestVal != null) {
-				if(getAdjacentTree(GridSquare.getAdjacent(AnthonyModelTeamClient.grid,lowestVal)) == null) {
+				if(getAdjacentTree(GridSquare.getAdjacent(OldClient.grid,lowestVal)) == null) {
 					return null;
 				}
-				childrensChildrenAdj = getAdjacentTree(GridSquare.getAdjacent(AnthonyModelTeamClient.grid,lowestVal));
+				childrensChildrenAdj = getAdjacentTree(GridSquare.getAdjacent(OldClient.grid,lowestVal));
 				begin = true;
 			}
 
@@ -176,7 +176,7 @@ public class AStar {
 					queue.add(lowestVal);
 					//assign the current children tree to have adjacent children to the lowestVal gridsquare
 					previousChildren = currentChildren;
-					currentChildren = getAdjacentTree(GridSquare.getAdjacent(AnthonyModelTeamClient.grid,currentChildren.get(level).get(currentindex)));
+					currentChildren = getAdjacentTree(GridSquare.getAdjacent(OldClient.grid,currentChildren.get(level).get(currentindex)));
 					level++;
 					begin = false;
 				}

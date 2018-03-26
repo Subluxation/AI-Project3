@@ -36,7 +36,7 @@ import spacesettlers.utilities.Vector2D;
  * @author amy
  * modified by Anthony and Spencer
  */
-public class AnthonySpencerTeamClient extends TeamClient {
+public class AnthonySpencerOLD extends TeamClient {
 	HashMap <UUID, Ship> asteroidToShipMap;
 	HashMap <UUID, Boolean> aimingForBase;
 	UUID asteroidCollectorID;
