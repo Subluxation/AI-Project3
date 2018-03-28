@@ -200,7 +200,7 @@ public class MoveAction extends AbstractAction {
 
 		double accel = error1 + error2;
 
-		return accel;
+		return accel; 
 	}
 
 	/**
