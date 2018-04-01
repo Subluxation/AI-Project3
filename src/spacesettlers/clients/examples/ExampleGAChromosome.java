@@ -17,9 +17,12 @@ import spacesettlers.simulator.Toroidal2DPhysics;
  */
 public class ExampleGAChromosome {
 	private HashMap<ExampleGAState, AbstractAction> policy;
+	private int[] thresholds;
+	private int maxThreshold = 5000;
 	
 	public ExampleGAChromosome() {
 		policy = new HashMap<ExampleGAState, AbstractAction>();
+		thresholds = getRandomThresholds();
 	}
 
 	/**
@@ -30,19 +33,42 @@ public class ExampleGAChromosome {
 	 */
 	public AbstractAction getCurrentAction(Toroidal2DPhysics space, Ship myShip, ExampleGAState currentState, Random rand) {
 		if (!policy.containsKey(currentState)) {
-			// randomly chose to either do nothing or go to the nearest
-			// asteroid.  Note this needs to be changed in a real agent as it won't learn 
-			// much here!
-			if (rand.nextBoolean()) {
-				policy.put(currentState, new DoNothingAction());
-			} else {
-				//System.out.println("Moving to nearestMineable Asteroid " + myShip.getPosition() + " nearest " + currentState.getNearestMineableAsteroid().getPosition());
+//			// randomly chose to either do nothing or go to the nearest
+//			// asteroid.  Note this needs to be changed in a real agent as it won't learn 
+//			// much here!
+//			if (rand.nextBoolean()) {
+//				policy.put(currentState, new DoNothingAction());
+//			} else {
+//				//System.out.println("Moving to nearestMineable Asteroid " + myShip.getPosition() + " nearest " + currentState.getNearestMineableAsteroid().getPosition());
+//				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
+//			}
+			if (myShip.getResources().getTotal() < thresholds[0])
+			{
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
+			}
+			else if (myShip.getEnergy() < thresholds[1])
+			{
+				
 			}
 		}
 
 		return policy.get(currentState);
 
+	}
+	
+	public int[] getRandomThresholds()
+	{
+		//0 = asteroid; 1 = beacon; 2 = base; 3 = core
+		int[] result = new int[4];
+		Random rand = new Random();
+		// Idea is to get an asteroid if num resources < result[0]
+		result[0] = (int) rand.nextDouble() * maxThreshold;
+		// Get beacon if energy < result[1]
+		result[1] = (int) rand.nextDouble() * maxThreshold;
+		// Go back to base if num resources > result[0]
+		result[2] = maxThreshold - result[0];
+		result[3] = (int) rand.nextDouble() * maxThreshold;
+		return result;
 	}
 	
 	

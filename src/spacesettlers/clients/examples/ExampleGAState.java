@@ -3,6 +3,7 @@ package spacesettlers.clients.examples;
 import java.util.Set;
 
 import spacesettlers.objects.Asteroid;
+import spacesettlers.objects.Beacon;
 import spacesettlers.objects.Ship;
 import spacesettlers.simulator.Toroidal2DPhysics;
 
@@ -18,6 +19,13 @@ import spacesettlers.simulator.Toroidal2DPhysics;
 public class ExampleGAState {
 	double distanceToNearestMineableAsteroid;
 	Asteroid nearestMineableAsteroid;
+	boolean isFindingAsteroid;
+	double distanceToNearestAbstractObject;
+	Beacon nearestBeacon;
+	boolean isFindingBeacon;
+	boolean isFindingBase;
+	boolean isFindingCore;
+	
 
 	public ExampleGAState(Toroidal2DPhysics space, Ship myShip) {
 		updateState(space, myShip);
@@ -32,7 +40,10 @@ public class ExampleGAState {
 	 */
 	public void updateState(Toroidal2DPhysics space, Ship myShip) {
 		Set<Asteroid> asteroids = space.getAsteroids();
+		Set<Beacon> beacons = space.getBeacons();
+		
 		distanceToNearestMineableAsteroid = Integer.MAX_VALUE;
+		distanceToNearestAbstractObject = Integer.MAX_VALUE;
 		double distance;
 
 		for (Asteroid asteroid : asteroids) {
@@ -42,6 +53,15 @@ public class ExampleGAState {
 					distanceToNearestMineableAsteroid = distance;
 					nearestMineableAsteroid = asteroid;
 				}
+			}
+		}
+		
+		for (Beacon beacon: beacons) {
+			distance = space.findShortestDistance(myShip.getPosition(), beacon.getPosition());
+			if (distance < distanceToNearestAbstractObject)
+			{
+				distanceToNearestAbstractObject = distance;
+				nearestBeacon = beacon;
 			}
 		}
 	}
