@@ -2,6 +2,7 @@ package spacesettlers.clients.examples;
 
 import java.util.ArrayList;
 
+import nguy0001.FitnessFunction;
 import spacesettlers.simulator.Toroidal2DPhysics;
 
 /**
@@ -43,7 +44,10 @@ public class ExampleGAPopulation {
 	 * @param space
 	 */
 	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space) {
-		fitnessScores[currentPopulationCounter] = 0;
+		FitnessFunction fitnessFn = new FitnessFunction();
+		fitnessFn.ratePerformance();
+		fitnessScores[currentPopulationCounter] = fitnessFn.getPerformance();
+//		fitnessScores[currentPopulationCounter] = 0;
 	}
 
 	/**

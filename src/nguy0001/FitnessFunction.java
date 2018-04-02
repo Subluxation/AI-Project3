@@ -148,7 +148,10 @@ public class FitnessFunction {
 	public void setBaseReturns(int baseReturns) {
 		this.baseReturns = baseReturns;
 	}
-	
+	public int getPerformance()
+	{
+		return performance;
+	}
 	
 	
 
