@@ -98,7 +98,7 @@ public class FitnessFunction {
 	 * 
 	 */
 	public boolean PerformWell() {
-		if(performance > 8) {
+		if(performance >= 8) {
 			return true;
 		}
 		else {
