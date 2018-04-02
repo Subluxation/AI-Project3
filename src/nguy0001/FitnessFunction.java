@@ -58,7 +58,11 @@ public class FitnessFunction {
 				break;
 		}
 		//rate cores collected per core gone after
-		if(coreRatio > .9) {
+		if(coresGoneAfter == 0) {
+			//Not sure what to do if it goes after no cores...
+			performance += 3;
+		}
+		else if(coreRatio > .9) {
 			performance += 5;
 		}
 		else if (coreRatio > .7) {
