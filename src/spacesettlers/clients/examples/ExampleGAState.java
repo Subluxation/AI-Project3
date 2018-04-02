@@ -2,7 +2,9 @@ package spacesettlers.clients.examples;
 
 import java.util.Set;
 
+import spacesettlers.objects.AiCore;
 import spacesettlers.objects.Asteroid;
+import spacesettlers.objects.Base;
 import spacesettlers.objects.Beacon;
 import spacesettlers.objects.Ship;
 import spacesettlers.simulator.Toroidal2DPhysics;
@@ -23,7 +25,9 @@ public class ExampleGAState {
 	double distanceToNearestAbstractObject;
 	Beacon nearestBeacon;
 	boolean isFindingBeacon;
+	Base nearestBase;
 	boolean isFindingBase;
+	AiCore nearestCore;
 	boolean isFindingCore;
 	
 
@@ -41,6 +45,7 @@ public class ExampleGAState {
 	public void updateState(Toroidal2DPhysics space, Ship myShip) {
 		Set<Asteroid> asteroids = space.getAsteroids();
 		Set<Beacon> beacons = space.getBeacons();
+		Set<AiCore> cores = space.getCores();
 		
 		distanceToNearestMineableAsteroid = Integer.MAX_VALUE;
 		distanceToNearestAbstractObject = Integer.MAX_VALUE;
@@ -64,6 +69,28 @@ public class ExampleGAState {
 				nearestBeacon = beacon;
 			}
 		}
+		
+		distanceToNearestAbstractObject = Integer.MAX_VALUE;
+		for (Base base : space.getBases()) {
+			if (base.getTeamName().equalsIgnoreCase(myShip.getTeamName())) {
+				distance = space.findShortestDistance(myShip.getPosition(), base.getPosition());
+				if (distance < distanceToNearestAbstractObject) {
+					distanceToNearestAbstractObject = distance;
+					nearestBase = base;
+				}
+			}
+		}
+		
+		distanceToNearestAbstractObject = Integer.MAX_VALUE;
+		for (AiCore core: cores) {
+			distance = space.findShortestDistance(myShip.getPosition(), core.getPosition());
+			if (distance < distanceToNearestAbstractObject)
+			{
+				distanceToNearestAbstractObject = distance;
+				nearestCore = core;
+			}
+		}
+		
 	}
 
 	
@@ -74,6 +101,18 @@ public class ExampleGAState {
 	 */
 	public Asteroid getNearestMineableAsteroid() {
 		return nearestMineableAsteroid;
+	}
+	
+	public Beacon getNearestBeacon() {
+		return nearestBeacon;
+	}
+	
+	public Base getNearestBase() {
+		return nearestBase;
+	}
+	
+	public AiCore getNearestCore() {
+		return nearestCore;
 	}
 
 
@@ -105,6 +144,12 @@ public class ExampleGAState {
 		ExampleGAState other = (ExampleGAState) obj;
 		if (Double.doubleToLongBits(distanceToNearestMineableAsteroid) != Double
 				.doubleToLongBits(other.distanceToNearestMineableAsteroid))
+			return false;
+		if (other.getNearestBase() != nearestBase)
+			return false;
+		if (other.getNearestBeacon() != nearestBeacon)
+			return false;
+		if (other.getNearestCore() != nearestCore)
 			return false;
 		return true;
 	}

@@ -48,7 +48,15 @@ public class ExampleGAChromosome {
 			}
 			else if (myShip.getEnergy() < thresholds[1])
 			{
-				
+				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBeacon()));
+			}
+			else if (myShip.getResources().getTotal() > thresholds[2])
+			{
+				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBase()));
+			}
+			else if (myShip.getNumCores() < thresholds[3])
+			{
+				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestCore()));
 			}
 		}
 
