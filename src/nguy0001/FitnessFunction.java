@@ -1,49 +1,104 @@
 package nguy0001;
 
+import java.util.ArrayList;
+
 /**
  * Class for Fitness Function
+ * Performance is on a scale of 0 - 15; 
+ * 0-7: Bad
+ * 8-15: Good
  * @author SpencerBarnes
  *
  */
 public class FitnessFunction {
-	//Refers to overall performance, -1 for bad performance, +1 for good performance
-	static double status = 0;
-	public static final int SHIP_MAX_ENERGY = 5000;
-	//Adjustable value for determining a good amount of energy to spend
-	public static final int performanceVal = 650;
-	//Adjustable value for determining a good fitness function
-	public static final int goodPerformance = 10;
+	//Object variables
+	static int deaths;
+	static double score;
+	static int coresCollected;
+	static int coresGoneAfter;
+	static int baseReturns;
+	static int performance;
 	
-	
-	
-	public static void fitnessFunction(double startEnergy, double endEnergy, boolean accomplishedGoal) {
+	/**
+	 * Empty constructor for the FitnessFunction Object
+	 */
+	public FitnessFunction() {
+		deaths = 0;
+		score = 0;
+		coresCollected = 0;
+		coresGoneAfter = 0;
+		baseReturns = 0;
+		performance = 0;
+	}
+	/**
+	 * Rating the performance of the ship
+	 * Deaths, score, & coreRatio
+	 */
+	public void ratePerformance() {
+		double coreRatio = coresCollected / coresGoneAfter;
 		
-		//If energy spend > than allowed spending?
-		if((startEnergy - endEnergy) > performanceVal ) {
-			--status;
-			//TODO:Work on spending less energy method here
+		//rate deaths
+		switch(deaths) {
+			case 0:
+				performance += 5;
+				break;
+			case 1:
+				performance += 4;
+				break;
+			case 2:
+				performance += 3;
+				break;
+			case 3:
+				performance += 2;
+				break;
+			case 4:
+				performance += 1;
+				break;
+			default:
+				break;
 		}
-		else {
-			++status;
-			//TODO:Save energy spending method here(?)
+		//rate cores collected per core gone after
+		if(coreRatio > .9) {
+			performance += 5;
 		}
-		//Did we accomplish the goal? i.e did we collect beacon?, energy?, attack ship?, etc
-		if(accomplishedGoal == true) {
-			++status;
-			//TODO:Save method for completing goal here
+		else if (coreRatio > .7) {
+			performance += 4;
 		}
-		else {
-			--status;
-			//TODO:Change method for completing goal here
+		else if (coreRatio > .5) {
+			performance += 3;
+		}
+		else if (coreRatio > .3) {
+			performance += 2;
+		}
+		else if (coreRatio > .1) {
+			performance += 1;
+		}
+		
+		//rate off of score
+		if(score > 100000.0) {
+			performance += 5;
+		}
+		else if(score > 70000.0) {
+			performance += 4;
+		}
+		else if(score > 30000.0) {
+			performance += 3;
+		}
+		else if(score > 15000.0) {
+			performance += 2;
+		}
+		else if(score > 4000.0) {
+			performance += 1;
 		}
 		
 	}
 	/**
-	 * Checking to see if the Fitness function is performing well
-	 * @return
+	 * Did the Ship perform well?
+	 * @return true --> yes; false --> no
+	 * 
 	 */
-	public static boolean isFunctionGood() {
-		if(status >= goodPerformance) {
+	public boolean PerformWell() {
+		if(performance > 8) {
 			return true;
 		}
 		else {
@@ -51,6 +106,39 @@ public class FitnessFunction {
 		}
 	}
 	
+	
+	
+	
+	public int getDeaths() {
+		return deaths;
+	}
+	public void setDeaths(int deaths) {
+		this.deaths = deaths;
+	}
+	public double getScore() {
+		return score;
+	}
+	public void setScore(double score) {
+		this.score = score;
+	}
+	public int getCoresCollected() {
+		return coresCollected;
+	}
+	public void setCoresCollected(int coresCollected) {
+		this.coresCollected = coresCollected;
+	}
+	public int getCoresGoneAfter() {
+		return coresGoneAfter;
+	}
+	public void setTotalCoresIngame(int coresGoneAfter) {
+		this.coresGoneAfter = coresGoneAfter;
+	}
+	public int getBaseReturns() {
+		return baseReturns;
+	}
+	public void setBaseReturns(int baseReturns) {
+		this.baseReturns = baseReturns;
+	}
 	
 	
 	
