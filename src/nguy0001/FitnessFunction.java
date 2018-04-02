@@ -35,7 +35,12 @@ public class FitnessFunction {
 	 * Deaths, score, & coreRatio
 	 */
 	public void ratePerformance() {
-		double coreRatio = coresCollected / coresGoneAfter;
+		
+		double coreRatio = 0;
+		if(coresGoneAfter != 0) {
+			coreRatio = coresCollected / coresGoneAfter;
+		}
+		
 		
 		//rate deaths
 		switch(deaths) {
