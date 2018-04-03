@@ -3,15 +3,17 @@ package spacesettlers.clients.examples;
 import java.util.ArrayList;
 
 import nguy0001.FitnessFunction;
+import spacesettlers.clients.Team;
+import spacesettlers.clients.TeamClient;
 import spacesettlers.simulator.Toroidal2DPhysics;
 
 /**
  * Stores a whole population of individuals for genetic algorithms / evolutionary computation
- * 
+ * Made extend GA client
  * @author amy
  *
  */
-public class ExampleGAPopulation {
+public class ExampleGAPopulation  {
 	private ExampleGAChromosome[] population;
 	
 	private int currentPopulationCounter;
@@ -43,10 +45,9 @@ public class ExampleGAPopulation {
 	 * 
 	 * @param space
 	 */
-	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space) {
-		FitnessFunction fitnessFn = new FitnessFunction();
-		fitnessFn.ratePerformance();
-		fitnessScores[currentPopulationCounter] = fitnessFn.getPerformance();
+	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space, FitnessFunction fn) {
+		fn.ratePerformance();
+		fitnessScores[currentPopulationCounter] = fn.getPerformance();
 //		fitnessScores[currentPopulationCounter] = 0;
 	}
 
