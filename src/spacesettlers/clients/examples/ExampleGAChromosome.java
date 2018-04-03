@@ -79,5 +79,15 @@ public class ExampleGAChromosome {
 		return result;
 	}
 	
+	public int getThresholdAt(int index)
+	{
+		return this.thresholds[index];
+	}
+	
+	public void setThreshold(int index, int threshold)
+	{
+		this.thresholds[index] = threshold;
+	}
+	
 	
 }
