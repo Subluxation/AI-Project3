@@ -4,9 +4,9 @@
 	<classname>spacesettlers.clients.examples.ExampleGAClient</classname>
 	
 	<!-- You can choose the color your team's ships will be on the screen.  Specify the red, green, and blue components -->
-	<teamColorRed>50</teamColorRed>
-	<teamColorGreen>0</teamColorGreen>
-	<teamColorBlue>200</teamColorBlue>
+	<teamColorRed>10</teamColorRed>
+	<teamColorGreen>70</teamColorGreen>
+	<teamColorBlue>10</teamColorBlue>
 	
 	<!-- The name that shows up in the ladder -->
 	<!-- <ladderName>Anthony and Spencer's Team</ladderName> -->

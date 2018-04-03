@@ -1,8 +1,11 @@
 package spacesettlers.clients.examples;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +26,7 @@ import spacesettlers.graphics.SpacewarGraphics;
 import spacesettlers.objects.AbstractActionableObject;
 import spacesettlers.objects.AbstractObject;
 import spacesettlers.objects.AiCore;
+import spacesettlers.objects.Base;
 import spacesettlers.objects.Ship;
 import spacesettlers.objects.powerups.SpaceSettlersPowerupEnum;
 import spacesettlers.objects.resources.ResourcePile;
@@ -39,7 +43,7 @@ public class ExampleGAClient extends TeamClient {
 	/**
 	 * The current policy for the team
 	 */
-	private ExampleGAChromosome currentPolicy;
+	private ExampleGAChromosome currentPolicy = new ExampleGAChromosome();
 	
 	/**
 	 * The current FitnessFunction for team
@@ -73,8 +77,6 @@ public class ExampleGAClient extends TeamClient {
 	private int cores = 0;
 	private int coresGA = 0;
 	private int score = 0;
-	
-	
 	HashMap<UUID, AbstractAction> actions;
 	AbstractAction temp;
 	
@@ -90,7 +92,7 @@ public class ExampleGAClient extends TeamClient {
 		for (AbstractObject actionable :  actionableObjects) {
 			if (actionable instanceof Ship) {
 				Ship ship = (Ship) actionable;
-				score = score + ship.getResources().getTotal();
+				
 				AbstractAction action;
 				
 				if (ship.getCurrentAction() == null || ship.getCurrentAction().isMovementFinished(space)) {
@@ -122,13 +124,20 @@ public class ExampleGAClient extends TeamClient {
 			incCores();
 			temp = null;
 		}
+		
 		//Did the ship die?
 		for(AbstractActionableObject ac : actionableObjects) {
-			if(ac instanceof Ship) {
+			if((AbstractObject)ac instanceof Ship) {
 				Ship ship = (Ship) ac;
+				
 				if(!ship.isAlive()) {
 					incDeaths();
 				}
+			}
+			if(ac instanceof Base) {
+				Base base = (Base) ac;
+				
+				score += base.getResources().getTotal();
 			}
 			//Is there an action going after a core?
 			if((AbstractObject)ac instanceof AiCore) {
@@ -149,6 +158,10 @@ public class ExampleGAClient extends TeamClient {
 			fn.setTotalCoresIngame(this.getCoresGA());
 			fn.setDeaths(this.getDeaths());
 			fn.setScore(this.getScore());
+			System.out.println("**The core received count is: " + this.getCores() + "**");
+			System.out.println("**The cores gone after is: " + this.getCoresGA() + "**");
+			System.out.println("**The death count is: " + this.getDeaths() + "**");
+			System.out.println("**The score being added is: " + this.getScore() + "**");
 			population.evaluateFitnessForCurrentMember(space, fn);
 
 			// move to the next member of the population
@@ -187,12 +200,20 @@ public class ExampleGAClient extends TeamClient {
 	 */
 	@Override
 	public void initialize(Toroidal2DPhysics space) {
+//		String fileName = System.getProperty("user.dir") +"/spacesettlers/clients/examples";
+//		try{
+//			FileWriter fw = new FileWriter(fileName,true);
+//			BufferedWriter bw = new BufferedWriter(fw);
+//			bw.write(str);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		XStream xstream = new XStream();
 		xstream.alias("ExampleGAPopulation", ExampleGAPopulation.class);
 
 		// try to load the population from the existing saved file.  If that failes, start from scratch
 		try { 
-			population = (ExampleGAPopulation) xstream.fromXML(new File("ThreshVals.xml"));
+			population = (ExampleGAPopulation) xstream.fromXML(new File(getKnowledgeFile()));
 		} catch (XStreamException e) {
 			// if you get an error, handle it other than a null pointer because
 			// the error will happen the first time you run
@@ -205,16 +226,12 @@ public class ExampleGAClient extends TeamClient {
 
 	@Override
 	public void shutDown(Toroidal2DPhysics space) {
-		
-		
-		
-		
 		XStream xstream = new XStream();
 		xstream.alias("ExampleGAPopulation", ExampleGAPopulation.class);
 
 		try { 
 			// if you want to compress the file, change FileOuputStream to a GZIPOutputStream
-			xstream.toXML(population, new FileOutputStream(new File("ThreshVals.xml")));
+			xstream.toXML(population, new FileOutputStream(new File(getKnowledgeFile())));
 		} catch (XStreamException e) {
 			// if you get an error, handle it somehow as it means your knowledge didn't save
 			System.out.println("Can't save knowledge file in shutdown ");

@@ -41,8 +41,8 @@
 		 each other and the static teams. -->
 	<variableTeams>
 		<HighLevelTeamConfig>
-			<teamName>GATeam</teamName>
-			<configFile>example-ga-clientinit.xml</configFile>
+			<teamName>Error404</teamName>
+			<configFile>spacesettlersinit.xml</configFile>
 		</HighLevelTeamConfig>
 	</variableTeams>
 
