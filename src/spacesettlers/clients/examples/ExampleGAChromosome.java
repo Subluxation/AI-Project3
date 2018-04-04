@@ -70,12 +70,12 @@ public class ExampleGAChromosome {
 		int[] result = new int[4];
 		Random rand = new Random();
 		// Idea is to get an asteroid if num resources < result[0]
-		result[0] = (int) rand.nextDouble() * maxThreshold;
+		result[0] = (int) (rand.nextDouble() * maxThreshold);
 		// Get beacon if energy < result[1]
-		result[1] = (int) rand.nextDouble() * maxThreshold;
+		result[1] = (int) (rand.nextDouble() * maxThreshold);
 		// Go back to base if num resources > result[0]
 		result[2] = maxThreshold - result[0];
-		result[3] = (int) rand.nextDouble() * maxThreshold;
+		result[3] = (int) (rand.nextDouble() * maxThreshold);
 		return result;
 	}
 	

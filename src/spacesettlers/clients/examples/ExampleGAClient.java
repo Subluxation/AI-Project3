@@ -79,6 +79,7 @@ public class ExampleGAClient extends TeamClient {
 	private int score = 0;
 	HashMap<UUID, AbstractAction> actions;
 	AbstractAction temp;
+	UUID asteroidCollectorID;
 	
 	@Override
 	public Map<UUID, AbstractAction> getMovementStart(Toroidal2DPhysics space,
@@ -94,6 +95,10 @@ public class ExampleGAClient extends TeamClient {
 				Ship ship = (Ship) actionable;
 				
 				AbstractAction action;
+				
+				if (asteroidCollectorID == null) {
+					asteroidCollectorID = ship.getId();
+				}
 				
 				if (ship.getCurrentAction() == null || ship.getCurrentAction().isMovementFinished(space)) {
 					ExampleGAState currentState = new ExampleGAState(space, ship);
@@ -134,11 +139,6 @@ public class ExampleGAClient extends TeamClient {
 					incDeaths();
 				}
 			}
-			if(ac instanceof Base) {
-				Base base = (Base) ac;
-				
-				score += base.getResources().getTotal();
-			}
 			//Is there an action going after a core?
 			if((AbstractObject)ac instanceof AiCore) {
 				for(UUID coreID: actions.keySet()) {
@@ -152,8 +152,15 @@ public class ExampleGAClient extends TeamClient {
 		}
 		// if the step counter is modulo evaluationSteps, then evaluate this member and move to the next one
 		if (steps % evaluationSteps == 0) {
-			// note that this method currently scores every policy as zero as this is part of 
-			// what the student has to do
+			for(AbstractActionableObject ac : actionableObjects) {
+				// Updates score based on the total Score a base has
+				if(ac instanceof Base) {
+					Base base = (Base) ac;
+					
+					if (base.getResources().getTotal() != score)
+						score += base.getResources().getTotal();
+				}
+			}
 			fn.setCoresCollected(this.getCores());
 			fn.setTotalCoresIngame(this.getCoresGA());
 			fn.setDeaths(this.getDeaths());
@@ -163,6 +170,11 @@ public class ExampleGAClient extends TeamClient {
 			System.out.println("**The death count is: " + this.getDeaths() + "**");
 			System.out.println("**The score being added is: " + this.getScore() + "**");
 			population.evaluateFitnessForCurrentMember(space, fn);
+			
+			fn.setCoresCollected(0);
+			fn.setTotalCoresIngame(0);
+			fn.setDeaths(0);
+			fn.setScore(0);
 
 			// move to the next member of the population
 			currentPolicy = population.getNextMember();
@@ -179,18 +191,99 @@ public class ExampleGAClient extends TeamClient {
 	}
 
 	@Override
-	public Map<UUID, SpaceSettlersPowerupEnum> getPowerups(Toroidal2DPhysics space,
-			Set<AbstractActionableObject> actionableObjects) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * If there is enough resourcesAvailable, buy a base.  Place it by finding a ship that is sufficiently
+	 * far away from the existing bases
+	 */
+	public Map<UUID, PurchaseTypes> getTeamPurchases(Toroidal2DPhysics space,
+			Set<AbstractActionableObject> actionableObjects, 
+			ResourcePile resourcesAvailable, 
+			PurchaseCosts purchaseCosts) {
+
+		HashMap<UUID, PurchaseTypes> purchases = new HashMap<UUID, PurchaseTypes>();
+		double BASE_BUYING_DISTANCE = 200;
+		boolean bought_base = false;
+
+		if (purchaseCosts.canAfford(PurchaseTypes.BASE, resourcesAvailable)) {
+			for (AbstractActionableObject actionableObject : actionableObjects) {
+				if (actionableObject instanceof Ship) {
+					Ship ship = (Ship) actionableObject;
+					Set<Base> bases = space.getBases();
+
+					// how far away is this ship to a base of my team?
+					double maxDistance = Double.MIN_VALUE;
+					for (Base base : bases) {
+						if (base.getTeamName().equalsIgnoreCase(getTeamName())) {
+							double distance = space.findShortestDistance(ship.getPosition(), base.getPosition());
+							if (distance > maxDistance) {
+								maxDistance = distance;
+							}
+						}
+					}
+
+					if (maxDistance > BASE_BUYING_DISTANCE) {
+						purchases.put(ship.getId(), PurchaseTypes.BASE);
+						bought_base = true;
+						//System.out.println("Buying a base!!");
+						break;
+					}
+				}
+			}		
+		} 
+
+		// see if you can buy EMPs
+		if (purchaseCosts.canAfford(PurchaseTypes.POWERUP_EMP_LAUNCHER, resourcesAvailable)) {
+			for (AbstractActionableObject actionableObject : actionableObjects) {
+				if (actionableObject instanceof Ship) {
+					Ship ship = (Ship) actionableObject;
+
+					if (!ship.getId().equals(asteroidCollectorID) && !ship.isValidPowerup(PurchaseTypes.POWERUP_EMP_LAUNCHER.getPowerupMap())) {
+						purchases.put(ship.getId(), PurchaseTypes.POWERUP_EMP_LAUNCHER);
+					}
+				}
+			}		
+		} 
+
+
+		// can I buy a ship?
+		if (purchaseCosts.canAfford(PurchaseTypes.SHIP, resourcesAvailable) && bought_base == false) {
+			for (AbstractActionableObject actionableObject : actionableObjects) {
+				if (actionableObject instanceof Base) {
+					Base base = (Base) actionableObject;
+
+					purchases.put(base.getId(), PurchaseTypes.SHIP);
+					break;
+				}
+
+			}
+
+		}
+
+
+		return purchases;
 	}
 
+	/**
+	 * The aggressive asteroid collector shoots if there is an enemy nearby! 
+	 * 
+	 * @param space
+	 * @param actionableObjects
+	 * @return
+	 */
 	@Override
-	public Map<UUID, PurchaseTypes> getTeamPurchases(Toroidal2DPhysics space,
-			Set<AbstractActionableObject> actionableObjects, ResourcePile resourcesAvailable,
-			PurchaseCosts purchaseCosts) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<UUID, SpaceSettlersPowerupEnum> getPowerups(Toroidal2DPhysics space,
+			Set<AbstractActionableObject> actionableObjects) {
+		HashMap<UUID, SpaceSettlersPowerupEnum> powerUps = new HashMap<UUID, SpaceSettlersPowerupEnum>();
+
+//		for (AbstractActionableObject actionableObject : actionableObjects){
+//			SpaceSettlersPowerupEnum powerup = SpaceSettlersPowerupEnum.values()[random.nextInt(SpaceSettlersPowerupEnum.values().length)];
+//			if (actionableObject.isValidPowerup(powerup) && random.nextDouble() < weaponsProbability && shouldShoot){
+//				powerUps.put(actionableObject.getId(), powerup);
+//			}
+//		}
+
+
+		return powerUps;
 	}
 
 	/**

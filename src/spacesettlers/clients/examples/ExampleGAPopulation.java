@@ -46,10 +46,9 @@ public class ExampleGAPopulation {
 	 * 
 	 * @param space
 	 */
-	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space) {
-		FitnessFunction fitnessFn = new FitnessFunction();
+	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space, FitnessFunction fitnessFn) {
 		fitnessFn.ratePerformance();
-		fitnessScores[currentPopulationCounter] = fitnessFn.getPerformance();
+		fitnessScores[currentPopulationCounter % population.length] = fitnessFn.getPerformance();
 //		fitnessScores[currentPopulationCounter] = 0;
 	}
 
@@ -98,6 +97,7 @@ public class ExampleGAPopulation {
 		// Initializing the parents
 		if (numSelection == 0)
 		{
+			parents = new ExampleGAChromosome[1];
 			// If the random generator gets 0, we need 1
 			// the child will be the chromosome at the index of the largest fitness
 			// which will be fitnessCopy[fitnessCopy.length - 1] since it is sorted by ascending
@@ -148,11 +148,9 @@ public class ExampleGAPopulation {
 					children[i].setThreshold(j, (int) rand.nextDouble() * 5000);
 				}
 			}
-			
-
 		}
 		
-
+		population = children;
 	}
 
 	/**
