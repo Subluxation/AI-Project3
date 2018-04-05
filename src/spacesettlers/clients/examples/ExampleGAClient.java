@@ -295,18 +295,20 @@ public class ExampleGAClient extends TeamClient {
 	public void initialize(Toroidal2DPhysics space) {
 		XStream xstream = new XStream();
 		xstream.autodetectAnnotations(true);
-		xstream.alias("ExampleGAChromosome", ExampleGAChromosome.class);
+		xstream.alias("ExampleGAPopulation", ExampleGAPopulation.class);
 		ExampleGAChromosome policy = null;
 		// try to load the population from the existing saved file.  If that failes, start from scratch
 		try { 
 			//System.out.println("KnowledgeFile: " + getKnowledgeFile());
-			AbstractAction aA = (AbstractAction) xstream.fromXML(new File(getKnowledgeFile()),"spacesettlers.clients.examples.ExampleGAChromosome");
-			ExampleGAState eGAS = (ExampleGAState) xstream.fromXML(new File(getKnowledgeFile()),"spacesettlers.clients.examples.ExampleGAChromosome");
-			int[] thresh = (int[]) xstream.fromXML(new File(getKnowledgeFile()),"thresholds");
-			HashMap<ExampleGAState, AbstractAction> hM = null;
-			hM.put(eGAS, aA);
+//			AbstractAction aA = (AbstractAction) xstream.fromXML(new File(getKnowledgeFile()));
+//			ExampleGAState eGAS = (ExampleGAState) xstream.fromXML(new File(getKnowledgeFile()));
+//			int[] thresh = (int[]) xstream.fromXML(new File(getKnowledgeFile()),"thresholds");
+			population = (ExampleGAPopulation) xstream.fromXML(new File(getKnowledgeFile()));
+			
+			HashMap<ExampleGAState, AbstractAction> hM = new HashMap<ExampleGAState, AbstractAction>();
+			hM.put(population.getFirstMember().getState(), population.getFirstMember().getAction());
 			System.out.println("hM isEmpty : " + hM.isEmpty());
-			policy = new ExampleGAChromosome(hM,thresh);
+			policy = new ExampleGAChromosome(hM,population.getFirstMember().getThresh());
 			System.out.println("policy isEmpty : " + policy);
 		} catch (XStreamException e) {
 			// if you get an error, handle it other than a null pointer because

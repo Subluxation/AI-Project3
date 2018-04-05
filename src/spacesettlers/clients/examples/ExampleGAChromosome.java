@@ -104,6 +104,15 @@ public class ExampleGAChromosome {
 		result[3] = (int) (rand.nextDouble() * maxThreshold);
 		return result;
 	}
+	public ExampleGAState getState() {
+		return currentState;
+	}
+	public AbstractAction getAction() {
+		return currentAction;
+	}
+	public int[] getThresh() {
+		return thresholds;
+	}
 
 	public int getThresholdAt(int index)
 	{
