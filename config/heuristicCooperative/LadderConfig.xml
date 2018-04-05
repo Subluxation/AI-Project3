@@ -42,7 +42,7 @@
 	<variableTeams>
 		<HighLevelTeamConfig>
 			<teamName>Error404</teamName>
-			<configFile>example-ga-clientinit.xml</configFile>
+			<configFile>spacesettlersinit.xml</configFile>
 		</HighLevelTeamConfig>
 	</variableTeams>
 

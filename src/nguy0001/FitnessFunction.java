@@ -152,6 +152,9 @@ public class FitnessFunction {
 	{
 		return performance;
 	}
+	public void setPerformance(int a) {
+		this.performance = a;
+	}
 	
 	
 

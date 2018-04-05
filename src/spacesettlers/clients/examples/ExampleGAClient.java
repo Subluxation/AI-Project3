@@ -63,7 +63,7 @@ public class ExampleGAClient extends TeamClient {
 	/**
 	 * How large of a population to evaluate
 	 */
-	private int populationSize = 25;
+	private int populationSize = 3;
 	
 	/**
 	 * Current step
@@ -165,10 +165,10 @@ public class ExampleGAClient extends TeamClient {
 			fn.setTotalCoresIngame(this.getCoresGA());
 			fn.setDeaths(this.getDeaths());
 			fn.setScore(this.getScore());
-			System.out.println("**The core received count is: " + this.getCores() + "**");
-			System.out.println("**The cores gone after is: " + this.getCoresGA() + "**");
-			System.out.println("**The death count is: " + this.getDeaths() + "**");
-			System.out.println("**The score being added is: " + this.getScore() + "**");
+//			System.out.println("**The core received count is: " + this.getCores() + "**");
+//			System.out.println("**The cores gone after is: " + this.getCoresGA() + "**");
+//			System.out.println("**The death count is: " + this.getDeaths() + "**");
+//			System.out.println("**The score being added is: " + this.getScore() + "**");
 			population.evaluateFitnessForCurrentMember(space, fn);
 			
 			fn.setCoresCollected(0);
@@ -293,44 +293,55 @@ public class ExampleGAClient extends TeamClient {
 	 */
 	@Override
 	public void initialize(Toroidal2DPhysics space) {
-//		String fileName = System.getProperty("user.dir") +"/spacesettlers/clients/examples";
-//		try{
-//			FileWriter fw = new FileWriter(fileName,true);
-//			BufferedWriter bw = new BufferedWriter(fw);
-//			bw.write(str);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		XStream xstream = new XStream();
-		xstream.alias("ExampleGAPopulation", ExampleGAPopulation.class);
-
+		xstream.autodetectAnnotations(true);
+		xstream.alias("ExampleGAChromosome", ExampleGAChromosome.class);
+		ExampleGAChromosome policy = null;
 		// try to load the population from the existing saved file.  If that failes, start from scratch
 		try { 
-			population = (ExampleGAPopulation) xstream.fromXML(new File(getKnowledgeFile()));
+			//System.out.println("KnowledgeFile: " + getKnowledgeFile());
+			AbstractAction aA = (AbstractAction) xstream.fromXML(new File(getKnowledgeFile()),"spacesettlers.clients.examples.ExampleGAChromosome");
+			ExampleGAState eGAS = (ExampleGAState) xstream.fromXML(new File(getKnowledgeFile()),"spacesettlers.clients.examples.ExampleGAChromosome");
+			int[] thresh = (int[]) xstream.fromXML(new File(getKnowledgeFile()),"thresholds");
+			HashMap<ExampleGAState, AbstractAction> hM = null;
+			hM.put(eGAS, aA);
+			System.out.println("hM isEmpty : " + hM.isEmpty());
+			policy = new ExampleGAChromosome(hM,thresh);
+			System.out.println("policy isEmpty : " + policy);
 		} catch (XStreamException e) {
 			// if you get an error, handle it other than a null pointer because
 			// the error will happen the first time you run
 			System.out.println("No existing population found - starting a new one from scratch");
 			population = new ExampleGAPopulation(populationSize);
 		}
-
-		currentPolicy = population.getFirstMember();
+		//Cannot use, just save last member
+		//currentPolicy = population.getFirstMember();
+		if(policy == null) {
+			System.out.println("Policy from reading file in is NULL! UH OH!");
+			population = new ExampleGAPopulation(populationSize);
+			policy = population.getFirstMember();
+		}
+		currentPolicy = policy;
 	}
 
 	@Override
 	public void shutDown(Toroidal2DPhysics space) {
 		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
 		xstream.alias("ExampleGAPopulation", ExampleGAPopulation.class);
+		//xstream.omitField(AbstractAction.class,"fieldName");
 
 		try { 
 			// if you want to compress the file, change FileOuputStream to a GZIPOutputStream
-			xstream.toXML(population, new FileOutputStream(new File(getKnowledgeFile())));
+			System.out.println("KnowledgeFile: " + getKnowledgeFile());
+			try {
+				xstream.toXML(population,new FileOutputStream(new File(getKnowledgeFile())));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (XStreamException e) {
 			// if you get an error, handle it somehow as it means your knowledge didn't save
-			System.out.println("Can't save knowledge file in shutdown ");
-			System.out.println(e.getMessage());
-		} catch (FileNotFoundException e) {
-			// file is missing so start from scratch (but tell the user)
 			System.out.println("Can't save knowledge file in shutdown ");
 			System.out.println(e.getMessage());
 		}

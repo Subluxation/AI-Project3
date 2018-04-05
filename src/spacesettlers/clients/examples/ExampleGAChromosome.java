@@ -3,6 +3,8 @@ package spacesettlers.clients.examples;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import spacesettlers.actions.AbstractAction;
 import spacesettlers.actions.DoNothingAction;
 import spacesettlers.actions.MoveToObjectAction;
@@ -16,9 +18,18 @@ import spacesettlers.simulator.Toroidal2DPhysics;
  *
  */
 public class ExampleGAChromosome {
+	@XStreamOmitField
 	private HashMap<ExampleGAState, AbstractAction> policy;
+	private ExampleGAState currentState;
+	private AbstractAction currentAction;
 	private int[] thresholds;
+	@XStreamOmitField
 	private int maxThreshold = 5000;
+
+	public ExampleGAChromosome(HashMap<ExampleGAState, AbstractAction> hM, int[] thresh) {
+		policy = hM;
+		thresholds = thresh;
+	}
 	
 	public ExampleGAChromosome() {
 		policy = new HashMap<ExampleGAState, AbstractAction>();
@@ -33,37 +44,52 @@ public class ExampleGAChromosome {
 	 */
 	public AbstractAction getCurrentAction(Toroidal2DPhysics space, Ship myShip, ExampleGAState currentState, Random rand) {
 		if (!policy.containsKey(currentState)) {
-//			// randomly chose to either do nothing or go to the nearest
-//			// asteroid.  Note this needs to be changed in a real agent as it won't learn 
-//			// much here!
-//			if (rand.nextBoolean()) {
-//				policy.put(currentState, new DoNothingAction());
-//			} else {
-//				//System.out.println("Moving to nearestMineable Asteroid " + myShip.getPosition() + " nearest " + currentState.getNearestMineableAsteroid().getPosition());
-//				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
-//			}
+			//			// randomly chose to either do nothing or go to the nearest
+			//			// asteroid.  Note this needs to be changed in a real agent as it won't learn 
+			//			// much here!
+			//			if (rand.nextBoolean()) {
+			//				policy.put(currentState, new DoNothingAction());
+			//			} else {
+			//				//System.out.println("Moving to nearestMineable Asteroid " + myShip.getPosition() + " nearest " + currentState.getNearestMineableAsteroid().getPosition());
+			//				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
+			//			}
 			if (myShip.getResources().getTotal() < thresholds[0])
 			{
+				this.currentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
 			}
 			else if (myShip.getEnergy() < thresholds[1])
 			{
+				this.currentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBeacon()));
 			}
 			else if (myShip.getResources().getTotal() > thresholds[2])
 			{
+				this.currentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBase()));
 			}
 			else if (myShip.getNumCores() < thresholds[3])
 			{
-				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestCore()));
+				if(currentState.getNearestCore() != null) {
+					this.currentState = currentState;
+					policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestCore()));
+				}
+				else {
+					this.currentState = currentState;
+					policy.put(currentState, new DoNothingAction());
+				}
+
+			}
+			else {
+				this.currentState = currentState;
+				policy.put(currentState, new DoNothingAction());
 			}
 		}
-
-		return policy.get(currentState);
-
+		
+		this.currentAction = policy.get(currentState);
+		return this.currentAction;
 	}
-	
+
 	public int[] getRandomThresholds()
 	{
 		//0 = asteroid; 1 = beacon; 2 = base; 3 = core
@@ -78,16 +104,16 @@ public class ExampleGAChromosome {
 		result[3] = (int) (rand.nextDouble() * maxThreshold);
 		return result;
 	}
-	
+
 	public int getThresholdAt(int index)
 	{
 		return this.thresholds[index];
 	}
-	
+
 	public void setThreshold(int index, int threshold)
 	{
 		this.thresholds[index] = threshold;
 	}
-	
-	
+
+
 }

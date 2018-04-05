@@ -2,6 +2,8 @@ package spacesettlers.clients.examples;
 
 import java.util.Set;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import spacesettlers.objects.AiCore;
 import spacesettlers.objects.Asteroid;
 import spacesettlers.objects.Base;
@@ -20,17 +22,22 @@ import spacesettlers.simulator.Toroidal2DPhysics;
  */
 public class ExampleGAState {
 	double distanceToNearestMineableAsteroid;
+	@XStreamOmitField
 	Asteroid nearestMineableAsteroid;
 	boolean isFindingAsteroid;
 	double distanceToNearestAbstractObject;
+	@XStreamOmitField
 	Beacon nearestBeacon;
 	boolean isFindingBeacon;
+	@XStreamOmitField
 	Base nearestBase;
 	boolean isFindingBase;
+	@XStreamOmitField
 	AiCore nearestCore;
 	boolean isFindingCore;
 	
 
+	
 	public ExampleGAState(Toroidal2DPhysics space, Ship myShip) {
 		updateState(space, myShip);
 	}

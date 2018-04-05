@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import nguy0001.FitnessFunction;
 import spacesettlers.simulator.Toroidal2DPhysics;
 
@@ -16,9 +18,7 @@ import spacesettlers.simulator.Toroidal2DPhysics;
  */
 public class ExampleGAPopulation {
 	private ExampleGAChromosome[] population;
-	
 	private int currentPopulationCounter;
-	
 	private double[] fitnessScores;
 
 	/**
@@ -49,6 +49,8 @@ public class ExampleGAPopulation {
 	public void evaluateFitnessForCurrentMember(Toroidal2DPhysics space, FitnessFunction fitnessFn) {
 		fitnessFn.ratePerformance();
 		fitnessScores[currentPopulationCounter % population.length] = fitnessFn.getPerformance();
+		fitnessFn.setPerformance(0);
+		fitnessFn.setDeaths(0);
 //		fitnessScores[currentPopulationCounter] = 0;
 	}
 
