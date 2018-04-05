@@ -20,7 +20,7 @@ import spacesettlers.simulator.Toroidal2DPhysics;
 public class ExampleGAChromosome {
 	@XStreamOmitField
 	private HashMap<ExampleGAState, AbstractAction> policy;
-	private ExampleGAState currentState;
+	private ExampleGAState newcurrentState;
 	private AbstractAction currentAction;
 	private int[] thresholds;
 	@XStreamOmitField
@@ -43,7 +43,11 @@ public class ExampleGAChromosome {
 	 * @return
 	 */
 	public AbstractAction getCurrentAction(Toroidal2DPhysics space, Ship myShip, ExampleGAState currentState, Random rand) {
-		if (!policy.containsKey(currentState)) {
+		if(policy == null) {
+			policy = new HashMap<ExampleGAState, AbstractAction>();
+			policy.put(currentState, new DoNothingAction());
+		}
+		else if (!policy.containsKey(currentState)) {
 			//			// randomly chose to either do nothing or go to the nearest
 			//			// asteroid.  Note this needs to be changed in a real agent as it won't learn 
 			//			// much here!
@@ -55,33 +59,33 @@ public class ExampleGAChromosome {
 			//			}
 			if (myShip.getResources().getTotal() < thresholds[0])
 			{
-				this.currentState = currentState;
+				this.newcurrentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestMineableAsteroid()));
 			}
 			else if (myShip.getEnergy() < thresholds[1])
 			{
-				this.currentState = currentState;
+				this.newcurrentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBeacon()));
 			}
 			else if (myShip.getResources().getTotal() > thresholds[2])
 			{
-				this.currentState = currentState;
+				this.newcurrentState = currentState;
 				policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestBase()));
 			}
 			else if (myShip.getNumCores() < thresholds[3])
 			{
 				if(currentState.getNearestCore() != null) {
-					this.currentState = currentState;
+					this.newcurrentState = currentState;
 					policy.put(currentState, new MoveToObjectAction(space, myShip.getPosition(), currentState.getNearestCore()));
 				}
 				else {
-					this.currentState = currentState;
+					this.newcurrentState = currentState;
 					policy.put(currentState, new DoNothingAction());
 				}
 
 			}
 			else {
-				this.currentState = currentState;
+				this.newcurrentState = currentState;
 				policy.put(currentState, new DoNothingAction());
 			}
 		}
@@ -105,7 +109,7 @@ public class ExampleGAChromosome {
 		return result;
 	}
 	public ExampleGAState getState() {
-		return currentState;
+		return newcurrentState;
 	}
 	public AbstractAction getAction() {
 		return currentAction;

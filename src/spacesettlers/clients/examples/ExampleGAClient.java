@@ -63,7 +63,7 @@ public class ExampleGAClient extends TeamClient {
 	/**
 	 * How large of a population to evaluate
 	 */
-	private int populationSize = 3;
+	private int populationSize = 10;
 	
 	/**
 	 * Current step
@@ -102,7 +102,15 @@ public class ExampleGAClient extends TeamClient {
 				
 				if (ship.getCurrentAction() == null || ship.getCurrentAction().isMovementFinished(space)) {
 					ExampleGAState currentState = new ExampleGAState(space, ship);
-					action = currentPolicy.getCurrentAction(space, ship, currentState, random);
+					//action = currentPolicy.getCurrentAction(space, ship, currentState, random);
+					if(currentPolicy.getCurrentAction(space, ship, currentState, random) != null) {
+						action = currentPolicy.getCurrentAction(space, ship, currentState, random);
+					}
+					else {
+						population = new ExampleGAPopulation(populationSize);
+						currentPolicy = population.getFirstMember();
+						action = currentPolicy.getCurrentAction(space, ship, currentState, random);
+					}
 					//System.out.println("New random action is " + action);
 				} else {
 					action = ship.getCurrentAction();
@@ -304,20 +312,17 @@ public class ExampleGAClient extends TeamClient {
 //			ExampleGAState eGAS = (ExampleGAState) xstream.fromXML(new File(getKnowledgeFile()));
 //			int[] thresh = (int[]) xstream.fromXML(new File(getKnowledgeFile()),"thresholds");
 			population = (ExampleGAPopulation) xstream.fromXML(new File(getKnowledgeFile()));
-			
 			HashMap<ExampleGAState, AbstractAction> hM = new HashMap<ExampleGAState, AbstractAction>();
 			hM.put(population.getFirstMember().getState(), population.getFirstMember().getAction());
 			System.out.println("hM isEmpty : " + hM.isEmpty());
 			policy = new ExampleGAChromosome(hM,population.getFirstMember().getThresh());
-			System.out.println("policy isEmpty : " + policy);
+			
 		} catch (XStreamException e) {
 			// if you get an error, handle it other than a null pointer because
 			// the error will happen the first time you run
 			System.out.println("No existing population found - starting a new one from scratch");
 			population = new ExampleGAPopulation(populationSize);
 		}
-		//Cannot use, just save last member
-		//currentPolicy = population.getFirstMember();
 		if(policy == null) {
 			System.out.println("Policy from reading file in is NULL! UH OH!");
 			population = new ExampleGAPopulation(populationSize);
